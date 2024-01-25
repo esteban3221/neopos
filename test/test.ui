@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+          <object class="GtkWindow" id="window_regla_venta">
+            <property name="default-height">400</property>
+            <property name="title">Configuracion de Tickets.</property>
+            <child>
+              <object class="GtkBox">
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="hexpand">0</property>
+                    <property name="hscrollbar-policy">never</property>
+                    <property name="min-content-height">200</property>
+                    <property name="vexpand">1</property>
+                    <child>
+                      <object class="GtkViewport">
+                        <property name="scroll-to-focus">1</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="margin-bottom">30</property>
+                            <property name="margin-end">60</property>
+                            <property name="margin-start">60</property>
+                            <property name="margin-top">30</property>
+                            <property name="orientation">vertical</property>
+                            
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="label">Visualizaciódn</property>
+                                <property name="margin-bottom">10</property>
+                                <property name="xalign">0</property>
+                                <style>
+                                  <class name="title-2"/>
+                                </style>
+                              </object>
+                            </child>
+                            
+                            <child>
+                              <object class="GtkListBox" id="list_reglas">
+                                <property name="selection-mode">none</property>
+                                <style>
+                                  <class name="rich-list"/>
+                                  <class name="boxed-list"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                            
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+          <object class="GtkSizeGroup">
+            <property name="mode">horizontal</property>
+          </object>
+        </interface>
