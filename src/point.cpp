@@ -56,15 +56,16 @@ void Pos::on_btn_pago_efectivo_clicked()
                     "%Y-%m-%d %H:%M:%S")
              << "\n";
     ticket << "No. Ticket: " << id << "\n\n";
-    //if (Conf->vec_check[4]->get_active())
-      // true;
-      // ticket << std::left << std::setw (10) << "Le atendió: "
-      //               << "Juan Perez"
-      //               << "\n\n"
-      //               << "--------------------------------\n";
-      ticket << "Articulo\n" 
-             << std::setw(10) << "Cnt." << std::setw(10) << "P.U." << "T.\n"
-             << "--------------------------------\n";
+    // if (Conf->vec_check[4]->get_active())
+    //  true;
+    //  ticket << std::left << std::setw (10) << "Le atendió: "
+    //                << "Juan Perez"
+    //                << "\n\n"
+    //                << "--------------------------------\n";
+    ticket << "Articulo\n"
+           << std::setw(10) << "Cnt." << std::setw(10) << "P.U."
+           << "T.\n"
+           << "--------------------------------\n";
     for (auto row : ModelCarroVenta->children())
     {
       ss << std::to_string(row[m_Columns_venta.sku]) << "|"
@@ -509,9 +510,39 @@ bool Pos::add_match_arcticulo(const Gtk::TreeModel::iterator &iter)
     double intPart, fracPart;
     fracPart = modf(spin_cantiad_point.get_value(), &intPart);
 
-    // venta NO a granel pero si con unidades especificas
-    if (fracPart == 0.0 && spin_cantiad_point.get_value() != 0)
+    // verificar si esta en promocion y verificar si cumple con las reglas de promocion
+
+    if (auto art_promo = Reg->obj_promo(std::to_string(iter->get_value(m_Columns_prod.sku))); std::get<0>(art_promo) != "")
     {
+      double _intPart, factor, art_sin_promo;
+      factor = spin_cantiad_point.get_value() / std::get<1>(art_promo);
+      modf(factor, &_intPart);
+
+      art_sin_promo = ((_intPart ? factor - _intPart : factor + _intPart) * std::get<1>(art_promo)) * iter->get_value(m_Columns_prod.precio_u);
+
+      row_venta = *(ModelCarroVenta->append());
+      row_venta[m_Columns_venta.sku] = iter->get_value(m_Columns_prod.sku);
+      row_venta[m_Columns_venta.cantidad] = spin_cantiad_point.get_value();
+      row_venta[m_Columns_venta.nombre] = _intPart ? iter->get_value(m_Columns_prod.nombre) + " ║ " + std::get<0>(art_promo) : iter->get_value(m_Columns_prod.nombre);
+      row_venta[m_Columns_venta.precio_u] = iter->get_value(m_Columns_prod.precio_u);
+      row_venta[m_Columns_venta.precio_t] = (_intPart * std::get<2>(art_promo)) + art_sin_promo;
+      total_vcarrito += row_venta[m_Columns_venta.precio_t];
+
+      ety_barras->set_css_classes({"entry"});
+      ss << std::fixed << std::setprecision(2) << total_vcarrito;
+      lbl_precio_total->set_markup("$<span font_desc='50'>" + ss.str() + "</span>");
+      ety_barras->set_placeholder_text("Ingrese Codigo de Barras");
+      ety_barras->set_text("");
+      on_spin_ingreso_changed();
+      spin_cantiad_point.set_value(0);
+
+      return true;
+    }
+
+    // venta NO a granel pero si con unidades especificas
+    else if (fracPart == 0.0 && spin_cantiad_point.get_value() != 0)
+    {
+
       row_venta = *(ModelCarroVenta->append());
       row_venta[m_Columns_venta.sku] = iter->get_value(m_Columns_prod.sku);
       row_venta[m_Columns_venta.cantidad] = spin_cantiad_point.get_value();
@@ -519,6 +550,7 @@ bool Pos::add_match_arcticulo(const Gtk::TreeModel::iterator &iter)
       row_venta[m_Columns_venta.precio_u] = iter->get_value(m_Columns_prod.precio_u);
       row_venta[m_Columns_venta.precio_t] = row_venta[m_Columns_venta.cantidad].operator float() * row_venta[m_Columns_venta.precio_u].operator float();
       total_vcarrito += row_venta[m_Columns_venta.precio_t];
+
       ety_barras->set_css_classes({"entry"});
       ss << std::fixed << std::setprecision(2) << total_vcarrito;
       lbl_precio_total->set_markup("$<span font_desc='50'>" + ss.str() + "</span>");
@@ -610,6 +642,7 @@ bool Pos::add_match_arcticulo(const Gtk::TreeModel::iterator &iter)
     spin_precio_articulo.set_value(0);
     return true;
   }
+  return false;
 }
 
 void Pos::on_ety_barras_icon_press(Gtk::Entry::IconPosition icon_position)
