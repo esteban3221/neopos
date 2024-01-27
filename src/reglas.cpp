@@ -189,12 +189,12 @@ Gtk::ListBoxRow *reglas::add_row(const std::string &sku, const std::string &titl
                                             sql->command("UPDATE promo SET alias = '" + label_subti->get_text() + "' WHERE sku = '" + sku + "'"); 
                                             index[sku] = std::make_tuple(label_subti->get_text(), std::get<1>(index[sku]), std::get<2>(index[sku]));
                                           });
-    spin_cantidad->signal_changed().connect([this, spin_cantidad, sku]()
+    spin_cantidad->signal_value_changed().connect([this, spin_cantidad, sku]()
                                             { 
                                                 sql->command("UPDATE promo SET mul = '" + spin_cantidad->get_text() + "' WHERE sku = '" + sku + "'"); 
                                                 index[sku] = std::make_tuple(std::get<0>(index[sku]), spin_cantidad->get_value_as_int(), std::get<2>(index[sku]));
                                                 });
-    spin_precio->signal_changed().connect([this, spin_precio, sku]()
+    spin_precio->signal_value_changed().connect([this, spin_precio, sku]()
                                           { 
                                             sql->command("UPDATE promo SET precio = '" + spin_precio->get_text() + "' WHERE sku = '" + sku + "'"); 
                                             index[sku] = std::make_tuple(std::get<0>(index[sku]), std::get<1>(index[sku]), spin_precio->get_value());

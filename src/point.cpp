@@ -194,7 +194,7 @@ void Pos::add_articulo_venta()
               row_venta = *(ModelCarroVenta->append());
               row_venta[m_Columns_venta.sku] = row[m_Columns_prod.sku];
               row_venta[m_Columns_venta.cantidad] = spin_cantiad_point.get_value();
-              row_venta[m_Columns_venta.nombre] = _intPart ? row[m_Columns_prod.nombre].operator Glib::ustring() + " | " + std::get<0>(art_promo) : row[m_Columns_prod.nombre].operator Glib::ustring();
+              row_venta[m_Columns_venta.nombre] = _intPart ? row[m_Columns_prod.nombre].operator Glib::ustring() + " ║ " + std::get<0>(art_promo) : row[m_Columns_prod.nombre].operator Glib::ustring();
               row_venta[m_Columns_venta.precio_u] = row[m_Columns_prod.precio_u].operator float();
               row_venta[m_Columns_venta.precio_t] = (_intPart * std::get<2>(art_promo)) + art_sin_promo;
               total_vcarrito += row_venta[m_Columns_venta.precio_t];
@@ -291,7 +291,7 @@ void Pos::add_articulo_venta()
                 art_sin_promo = ((_intPart ? factor - _intPart : factor + _intPart) * std::get<1>(art_promo)) * row[m_Columns_prod.precio_u].operator float();
 
                 row_venta[m_Columns_venta.cantidad] = cant;
-                row_venta[m_Columns_venta.nombre] = _intPart ? row[m_Columns_prod.nombre].operator Glib::ustring() + " | " + std::get<0>(art_promo) : row[m_Columns_prod.nombre].operator Glib::ustring();
+                row_venta[m_Columns_venta.nombre] = _intPart ? row[m_Columns_prod.nombre].operator Glib::ustring() + " ║ " + std::get<0>(art_promo) : row[m_Columns_prod.nombre].operator Glib::ustring();
                 row_venta[m_Columns_venta.precio_t] = (_intPart * std::get<2>(art_promo)) + art_sin_promo;
 
                 total_vcarrito += _decimal > 0 ? row_venta[m_Columns_venta.precio_u] : std::get<2>(art_promo) - ((std::get<1>(art_promo) - 1) * row[m_Columns_prod.precio_u].operator float());
@@ -382,7 +382,7 @@ bool Pos::on_spin_ingreso_activate(guint keyval, guint, Gdk::ModifierType state)
         art_sin_promo = ((_intPart ? factor - _intPart : factor + _intPart) * std::get<1>(art_promo)) * (*row)[m_Columns_venta.precio_u].operator float();
 
         (*row)[m_Columns_venta.cantidad] = cant;
-        (*row)[m_Columns_venta.nombre] = _intPart && !((*row)[m_Columns_venta.nombre].operator Glib::ustring().find(std::get<0>(art_promo)) != std::string::npos) ? (*row)[m_Columns_venta.nombre].operator Glib::ustring() + " | " + std::get<0>(art_promo) : (*row)[m_Columns_venta.nombre].operator Glib::ustring();
+        (*row)[m_Columns_venta.nombre] = _intPart && !((*row)[m_Columns_venta.nombre].operator Glib::ustring().find(std::get<0>(art_promo)) != std::string::npos) ? (*row)[m_Columns_venta.nombre].operator Glib::ustring() + " ║ " + std::get<0>(art_promo) : (*row)[m_Columns_venta.nombre].operator Glib::ustring();
         (*row)[m_Columns_venta.precio_t] = (_intPart * std::get<2>(art_promo)) + art_sin_promo;
 
         total_vcarrito += _decimal > 0 ? (*row)[m_Columns_venta.precio_u] : std::get<2>(art_promo) - ((std::get<1>(art_promo) - 1) * (*row)[m_Columns_venta.precio_u].operator float());
