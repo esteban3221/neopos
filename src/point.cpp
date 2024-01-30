@@ -134,7 +134,7 @@ void Pos::on_btn_pago_efectivo_clicked()
 #ifdef _WIN32
     bool activo = false;
     if (impresion_act->get_state(activo); activo)
-      std::system("print temp.txt");
+      std::system("notepad /p temp.txt");
 #endif
 
     remove("temp.txt");

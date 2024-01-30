@@ -685,15 +685,17 @@ void Pos::carga_señales()
     add_controller(refGesture);
 
     auto gmenu = Gio::Menu::create();
-    gmenu->append("_Cancela Venta.", "popup.remove");
+    gmenu->append("_Cancela Venta", "popup.remove");
+    gmenu->append("_Reimprimir", "popup.reimprime");
     auto refActionGroup = Gio::SimpleActionGroup::create();
 
     refActionGroup->add_action("remove", sigc::mem_fun(*this, &Pos::on_menu_file_popup_generic));
+    refActionGroup->add_action("reimprime", sigc::mem_fun(*this, &Pos::on_menu_file_popup_reimprime));
     insert_action_group("popup", refActionGroup);
 
     m_MenuPopup.set_parent(*tree_repor);
     m_MenuPopup.set_menu_model(gmenu);
-    m_MenuPopup.set_has_arrow(false);
+    m_MenuPopup.set_has_arrow();
 
     btn_add_produ->signal_clicked().connect([this]()
                                             {

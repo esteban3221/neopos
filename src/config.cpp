@@ -491,7 +491,7 @@ conf::conf (std::shared_ptr<SQLite> db) : sql(db)
         std::system ("lp tempo.txt");
 #endif
 #ifdef _WIN32
-        std::system ("print tempo.txt");
+        std::system ("notepad /p temp.txt");
 #endif
         remove ("tempo.txt");
       });

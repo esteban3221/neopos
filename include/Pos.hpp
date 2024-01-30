@@ -305,6 +305,7 @@ private:
 
     void on_popup_button_pressed(int n_press, double x, double y);
     void on_menu_file_popup_generic();
+    void on_menu_file_popup_reimprime();
     void act_dashboard();
     void edit_ticket();
     void on_ety_barras_icon_press(Gtk::Entry::IconPosition icon_position);

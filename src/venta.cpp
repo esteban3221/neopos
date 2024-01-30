@@ -1,5 +1,6 @@
-
 #include "Pos.hpp"
+#include <iomanip>
+#include <fstream>
 
 void Pos::init_reporte()
 {
@@ -63,7 +64,7 @@ void Pos::on_tree_detalle_venta_row_activated(const Gtk::TreeModel::Path &path, 
                 row_detalle_venta[m_Columns_detalle_venta.cantidad] = std::stof(tokens[1]);
                 row_detalle_venta[m_Columns_detalle_venta.nombre] = tokens[2];
                 row_detalle_venta[m_Columns_detalle_venta.precio_u] = std::stof(tokens[3]);
-                row_detalle_venta[m_Columns_detalle_venta.precio_t] = std::stof(tokens[1]) * std::stof(tokens[3]);
+                row_detalle_venta[m_Columns_detalle_venta.precio_t] = std::stof(tokens[4]);
                 tokens.clear();
             }
         }
@@ -74,13 +75,14 @@ void Pos::on_popup_button_pressed(int /* n_press */, double x, double y)
 {
     if (tree_repor->is_focus())
     {
-        const Gdk::Rectangle rect(x, y - 110, 1, 1);
+        const Gdk::Rectangle rect(x, y - 50, 0, 0);
         m_MenuPopup.set_pointing_to(rect);
         m_MenuPopup.popup();
     }
 }
 
-void Pos::act_dashboard(){
+void Pos::act_dashboard()
+{
     db->command("SELECT sum(total) FROM venta WHERE strftime('%Y-%m', fecha) = strftime('%Y-%m', 'now');");
     lbl_venta_mes->set_markup("$<span font_desc='50'>" + db->get_result()[0][0] + "</span>");
     db->clear_result();
@@ -118,9 +120,109 @@ void Pos::act_dashboard(){
     db->clear_result();
 }
 
+void Pos::on_menu_file_popup_reimprime()
+{
+    auto refSelection = tree_repor->get_selection();
+
+    if (refSelection)
+    {
+        auto iter = refSelection->get_selected();
+        
+        std::stringstream ticket;
+
+        ticket << "****** TICKET DE COMPRA ******\n"
+               << "--------------------------------\n"
+               << "-----------REIMPRESION----------\n"
+               << "--------------------------------\n\n"
+               << std::left << std::setw(20)
+               << Conf->ety_conf_razon->get_text() << "\n\n";
+
+        if (Conf->vec_check[2]->get_active())
+        {
+            ticket << "Dirección: " << Conf->ety_conf_direccion->get_text()
+                   << "\n"
+                   << "--------------------------------\n";
+        }
+
+        if (Conf->vec_check[3]->get_active())
+        {
+            ticket << "RFC: " << Conf->ety_conf_rfc->get_text() << "\n"
+                   << "--------------------------------\n";
+        }
+        if (Conf->vec_check[1]->get_active())
+            ticket << "Fecha: "
+                   << (*iter)[m_Columns_reporte.fecha]
+                   << "\n";
+        ticket << "No. Ticket: " << (*iter)[m_Columns_reporte.id] << "\n\n";
+        // if (Conf->vec_check[4]->get_active())
+        //  true;
+        //  ticket << std::left << std::setw (10) << "Le atendió: "
+        //                << "Juan Perez"
+        //                << "\n\n"
+        //                << "--------------------------------\n";
+        ticket << "Articulo\n"
+               << std::setw(10) << "Cnt." << std::setw(10) << "P.U."
+               << "T.\n"
+               << "--------------------------------\n";
+
+        std::istringstream iss((*iter)[m_Columns_reporte.datos].operator Glib::ustring());
+        std::string token;
+        std::vector<std::string> tokens;
+        while (std::getline(iss, token, '|'))
+        {
+            tokens.push_back(token);
+            if (tokens.size() == 5)
+            {
+
+                ticket << tokens[2] << "\n"
+                   << std::setw(10) << tokens[1]
+                   << "$" << std::setw(10) << tokens[3]
+                   << "$" << tokens[4] << std::endl;
+
+                tokens.clear();
+            }
+        }
+
+        ticket << "--------------------------------\n";
+        ticket << std::left << std::setw(20) << "Total:"
+               << "$" << std::fixed << std::setprecision(2) << (*iter)[m_Columns_reporte.total] << std::endl;
+        ticket << std::left << std::setw(20) << "Tipo de Pago:"
+               << (*iter)[m_Columns_reporte.tipo] << "\n"
+               << "--------------------------------\n";
+        ticket << std::left << std::setw(20) << "Ingreso:"
+               << "$" << (*iter)[m_Columns_reporte.ingreso] << "\n";
+        ticket << std::left << std::setw(20) << "Cambio:"
+               << "$" << std::fixed << (*iter)[m_Columns_reporte.cambio] << std::endl
+               << "--------------------------------\n";
+        ticket << "Folio Tarjeta:  " << (*iter)[m_Columns_reporte.folio] << std::endl
+               << "--------------------------------\n";
+        if (Conf->vec_check[5]->get_active())
+            ticket << "**" << Conf->ety_conf_contacto->get_text() << "**"
+                   << "\n"
+                   << "--------------------------------\n";
+        if (Conf->vec_check[0]->get_active())
+            ticket << "**" << Conf->ety_conf_thanks->get_text() << "**"
+                   << "\n"
+                   << "--------------------------------\n";
+
+        std::ofstream archivoTemp("temp.txt");
+        archivoTemp << ticket.str();
+        archivoTemp.close();
+
+#ifdef __linux__
+            std::system("lp temp.txt");
+#endif
+
+#ifdef _WIN32
+            std::system("notepad /p temp.txt");
+#endif
+
+        remove("temp.txt");
+    }
+}
+
 void Pos::on_menu_file_popup_generic()
 {
-    std::cout << "A popup menu item was selected." << std::endl;
 
     auto refSelection = tree_repor->get_selection();
     if (refSelection)
@@ -133,7 +235,8 @@ void Pos::on_menu_file_popup_generic()
             dialog->get_content_area()->append(ety_folio);
             dialog->add_button("Cancelar Venta", Gtk::ResponseType::OK)->set_css_classes({"destructive-action"});
             ety_folio.show();
-            dialog->signal_response().connect([=](int response){
+            dialog->signal_response().connect([=](int response)
+                                              {
                 if(response == Gtk::ResponseType::OK){
                     if(!ety_folio.get_text().empty()){
 
@@ -166,8 +269,7 @@ void Pos::on_menu_file_popup_generic()
                 }
                 else
                     dialog->hide();
-                act_dashboard();
-            });
+                act_dashboard(); });
             ety_folio.grab_focus();
             dialog->show();
         }
