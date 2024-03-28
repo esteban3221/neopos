@@ -1,7 +1,7 @@
 #include "sqlite.hpp"
 #include <fstream>
 
-std::vector<std::vector<std::string>> result;
+
 
 SQLite::SQLite()
 {
@@ -54,12 +54,13 @@ int SQLite::callback(void *NotUsed, int argc, char **argv, char **azColName)
     {
         row.emplace_back(argv[i] ? argv[i] : "NULL");
     }
-    ::result.emplace_back(row);
+    result.emplace_back(row);
     return 0;
 }
 
 void SQLite::command(std::string sql)
 {
+    result.clear();
     rc = sqlite3_exec(db, sql.c_str(), callback, 0, &zErrMsg);
     if (rc != SQLITE_OK)
     {
@@ -76,15 +77,10 @@ void SQLite::command(std::string sql)
 
 const std::vector<std::vector<std::string>> SQLite::get_result() const
 {
-    return ::result;
+    return result;
 }
 
 int SQLite::get_rc() const
 {
     return rc;
-}
-
-void SQLite::clear_result()
-{
-    ::result.clear();
 }

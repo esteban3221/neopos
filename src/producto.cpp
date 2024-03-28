@@ -111,7 +111,7 @@ void Pos::init_producto()
     cell_precio_u->property_digits() = 2;
 
     // Add some data:
-    db->clear_result();
+    
     db->command("SELECT * FROM producto");
 
     std::cout << "atm: " << db->get_result().size() << std::endl;
@@ -134,7 +134,7 @@ void Pos::init_producto()
         row_producto[m_Columns_prod.granel] = db->get_result()[i][9] == "1" ? true : false;
     }
     std::cout << "Subcate: " << subcategoria_map.size() << std::endl;
-    db->clear_result();
+    
     std::cout << "Subcate: " << subcategoria_map.size() << std::endl;
     cont_prod = m_refTreeModel_prod->children().size();
     lbl_cont_prod->set_text("Productos: " + std::to_string(cont_prod));

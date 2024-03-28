@@ -3,7 +3,6 @@
 #include <iostream>
 #include <vector>
 
-
 class SQLite
 {
 private:
@@ -12,6 +11,7 @@ private:
     int rc;
     std::string sql;
     static int callback(void *, int , char **, char **);
+    static inline std::vector<std::vector<std::string>> result;
 
 public:
     SQLite();
@@ -20,5 +20,4 @@ public:
     void command(std::string);
     int get_rc() const;
     const std::vector<std::vector<std::string>> get_result() const;
-    void clear_result();
 };

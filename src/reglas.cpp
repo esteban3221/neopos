@@ -87,7 +87,6 @@ reglas::reglas(std::shared_ptr<SQLite> db) : sql(db)
         this->list_reglas->prepend(*add_row(sql->get_result()[i][0], sql->get_result()[i][1], sql->get_result()[i][2], std::stoul(sql->get_result()[i][3]), std::stod(sql->get_result()[i][4])));
         this->index[sql->get_result()[i][0]] = std::make_tuple(sql->get_result()[i][2], std::stoul(sql->get_result()[i][3]), std::stod(sql->get_result()[i][4]));
     }
-    this->sql->clear_result();
 
     this->add_regla.signal_clicked().connect([this]()
                                              { 
@@ -122,7 +121,7 @@ reglas::reglas(std::shared_ptr<SQLite> db) : sql(db)
                                                    }
                                                }
                                                this->ety_producto.set_text("");
-                                               this->sql->clear_result(); });
+                                                });
 }
 
 Gtk::ListBoxRow *reglas::add_row(const std::string &sku, const std::string &title, const std::string &subtitle, uint16_t mul, double precio)

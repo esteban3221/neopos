@@ -581,7 +581,7 @@ void conf::initconf ()
       vec_check[i]->set_active (std::stoi (sql->get_result ()[0][i]));
     }
 	
-  sql->clear_result();
+  
 
   sql->command ("SELECT * FROM data_conf");
   ety_conf_razon->set_text (sql->get_result ()[0][0]);
@@ -590,7 +590,7 @@ void conf::initconf ()
   ety_conf_contacto->set_text (sql->get_result ()[0][3]);
   ety_conf_thanks->set_text (sql->get_result ()[0][4]);
 
-  sql->clear_result();
+  
 }
 
 void conf::edit_ticket()

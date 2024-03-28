@@ -576,7 +576,7 @@ Pos::Pos(const Glib::RefPtr<Gtk::Application> &app) : builder(std::make_unique<B
 
     db->command("SELECT * FROM conf");
     impresion_act->change_state((bool)std::stoi(db->get_result()[0][6]));
-    db->clear_result();
+    
 
     refActionGroup->add_action("config.ticket", [=]()
                                { Conf->show(); });
@@ -845,7 +845,7 @@ void Pos::init()
         iter_ = m_refTreeModelCombo->append();
         (*iter_)[m_ColumnsCombo.m_col_name] = db->get_result()[i][3];
     }
-    db->clear_result();
+    
 
     tree_prov->set_search_column(m_Columns.m_col_name);
     tree_prov->set_enable_search(true);
