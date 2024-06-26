@@ -108,8 +108,9 @@ reglas::reglas(std::shared_ptr<SQLite> db) : sql(db)
                                                {
                                                    try
                                                    {
-                                                       this->sql->command("INSERT INTO promo VALUES(" + sql->get_result()[0][0] + ", '" + sql->get_result()[0][1] + "', '', 0,0)");
                                                        this->list_reglas->prepend(*add_row(sql->get_result()[0][0],sql->get_result()[0][1], "Editame (Alias)",0,0));
+                                                       this->sql->command("INSERT INTO promo VALUES(" + sql->get_result()[0][0] + ", '" + sql->get_result()[0][1] + "', '', 0,0)");
+                                                       
                                                        this->index[ety_producto.get_text()] = std::make_tuple("",0,0);
                                                        this->ety_producto.set_placeholder_text("Ingresa el codigo de producto");
                                                        this->ety_producto.set_css_classes({"entry"});
